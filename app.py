@@ -4,7 +4,7 @@ import numpy as np
 import math
 from itertools import *
 import streamlit.components.v1 as stc
-from more_itertools import *
+#from more_itertools import *
 
 import plotly.express as px
 st.set_page_config(  # Alternate names: setup_page, page, layout
@@ -52,13 +52,13 @@ calc_type = st.sidebar.selectbox(
     'select type', options=['INVESTMENT', 'REPAYMENT'])
 if calc_type == 'INVESTMENT':
     select_tenure = st.slider("select tenure in yrs",
-                              min_value=1, max_value=50, value=4, step=1)
+                              min_value=1, max_value=50, value=15, step=1)
 
     col1, col2 = st.columns([1, 1])
     stop_year = col1.number_input(
         "Investment Stop Year", min_value=0, max_value=select_tenure, step=1, value=select_tenure)
     inflation = col2.number_input(
-        "Inflation (yearly) in percentage", min_value=0.0, max_value=14.0, value=4.0, step=0.1)
+        "Inflation (yearly) in percentage", min_value=0.0, max_value=14.0, value=5.5, step=0.1)
 
     monthly_inv = col1.number_input("Monthly inv", min_value=0, value=0)
     lumpsum = col1.number_input("Lumpsum", min_value=0, value=0)
@@ -66,7 +66,7 @@ if calc_type == 'INVESTMENT':
         "rate of Increase(yr)", min_value=0.0, max_value=100.0, step=0.1, value=0.0)
 
     rate_of_return = st.slider(
-        "Rate of return", min_value=0.0, max_value=100.0, value=0.0, step=0.5)
+        "Rate of return", min_value=0.0, max_value=100.0, value=12.0, step=0.5)
 
     ret = sip(monthly_inv, select_tenure,
               rate_of_return, lumpsum, is_percent=True, inflation_rate=inflation, rate_of_increase=rate_of_increase, stop_year=stop_year)
