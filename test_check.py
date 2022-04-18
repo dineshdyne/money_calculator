@@ -10,10 +10,8 @@ import json
 import math
 import time
 import base64
-import pybase64
 import urllib
 import inspect
-import sklearn
 import numpy as np
 import pandas as pd
 
@@ -22,7 +20,6 @@ from itertools import *
 from functools import *
 from statistics import *
 from collections import *
-from more_itertools import *
 #from matplotlib_venn import *
 
 # from pandas.plotting import *
