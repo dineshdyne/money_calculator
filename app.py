@@ -60,7 +60,8 @@ if calc_type == 'INVESTMENT':
     inflation = col2.number_input(
         "Inflation (yearly) in percentage", min_value=0.0, max_value=14.0, value=5.5, step=0.1)
 
-    monthly_inv = col1.number_input("Monthly inv", min_value=0, value=0)
+    monthly_inv = col1.number_input(
+        "Monthly inv", min_value=0, value=5000, step=100)
     lumpsum = col1.number_input("Lumpsum", min_value=0, value=0)
     rate_of_increase = col2.number_input(
         "rate of Increase(yr)", min_value=0.0, max_value=100.0, step=0.1, value=0.0)
@@ -71,14 +72,17 @@ if calc_type == 'INVESTMENT':
     ret = sip(monthly_inv, select_tenure,
               rate_of_return, lumpsum, is_percent=True, inflation_rate=inflation, rate_of_increase=rate_of_increase, stop_year=stop_year)
 
-    final_vals = ret['Amount every month'].iloc[-1].astype(int).to_dict()
+    final_vals = ret['Amount every month'].iloc[-1].astype(int)  # .to_dict()
+
+    final_vals = final_vals.to_dict()
     st.write(final_vals)
-
     st.plotly_chart(px.bar(ret['Amount every month'], y=[
-        'invested', 'profit'], width=800, height=600))
+        'invested', 'profit']), use_container_width=True)
 
+    st.markdown(
+        f"""Total : <span style="color:green">{int(final_vals['total'])}</span>""", unsafe_allow_html=True)
     st.write(
-        f"The Total : {int(final_vals['total'])} would amount to present day {int(final_vals['total']/((100+inflation)/100)**select_tenure)}")
+        f"""Equalent to Present day: <span style="color:green">{int(final_vals['total']/((100+inflation)/100)**select_tenure)}</span>""", unsafe_allow_html=True)
 elif calc_type == "REPAYMENT":
     select_tenure = st.slider("select tenure in yrs",
                               min_value=1, max_value=50, value=4, step=1)
@@ -86,12 +90,14 @@ elif calc_type == "REPAYMENT":
     loan_amt = col1.number_input(
         "Enter Loan Amt", min_value=0, step=1000, value=0)
     rate_of_interest = col2.slider(
-        "Loan rate of interest", min_value=0.05, step=0.05, max_value=30.0)
+        "Loan rate of interest", min_value=0.05, value=8.0, step=0.05, max_value=30.0)
     inflation = col2.number_input(
-        "Inflation (yearly) in percentage", min_value=0.0, max_value=14.0, value=4.0, step=0.1)
+        "Inflation (yearly) in percentage", min_value=0.0, max_value=14.0, value=5.5, step=0.1)
 
     emi_amt = emi(loan_amt, rate_of_interest/1200, select_tenure*12)
-    st.write(f"EMI {emi_amt}")
+    st.markdown(
+        f"""EMI : <span style="color:green">{emi_amt}</span>""", unsafe_allow_html=True)
+
     col1, col2 = st.columns([1, 1])
     extra_payment = col1.number_input(
         "Enter extra payment", min_value=0, step=100)
@@ -124,15 +130,18 @@ elif calc_type == "REPAYMENT":
         # st.write(int(loan_amt))
         interest.append(int_comp)
         principle.append(princ_comp)
-    st.write(int(loan_amt))
-    st.write(f"number of months: {num_months}")
+    # st.write(int(loan_amt))
+    st.markdown(
+        f"""Number of Months: <span style="color: green">{num_months}</span>""", unsafe_allow_html=True)
 
     df = pd.DataFrame(zip(principle,  extra, interest, emi_inc),
                       columns=['principle', 'extra', 'interest', 'emi_inc'])
-    st.write(f"total paid :  {int(df.sum().sum())}")
-    st.write(f"total paid : inflation adjusted {int(inf_invested)}")
-
+    df = df.loc[:, (df != 0).any(axis=0)]
+    st.markdown(
+        f"""Total Paid :  <span style="color:green">{int(df.sum().sum())}</span>""", unsafe_allow_html=True)
+    st.markdown(
+        f"""Total Paid : Inflation Adjusted <span style="color:green">{int(inf_invested)}</span>""", unsafe_allow_html=True)
     st.plotly_chart(
-        px.bar(df, y=['principle', 'extra', 'interest', 'emi_inc'],
+        px.bar(df, y=list(df.columns),
                #color_discrete_sequence=['green', 'blue', 'red', 'cyan']
-               ))
+               ), use_container_width=True)
