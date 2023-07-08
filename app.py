@@ -76,10 +76,10 @@ if calc_type == 'INVESTMENT':
     st.plotly_chart(px.bar(ret['Amount every month'], y=[
         'invested', 'profit']), use_container_width=True)
 
-    st.markdown(
-        f"""Total : <span style="color:green">{int(final_vals['total'])}</span>""", unsafe_allow_html=True)
-    st.write(
-        f"""Equivalent to Present day: <span style="color:green">{int(final_vals['total']/((100+inflation)/100)**select_tenure)}</span>""", unsafe_allow_html=True)
+    # st.markdown(
+    #     f"""Total : <span style="color:green">{int(final_vals['total'])}</span>""", unsafe_allow_html=True)
+    # st.write(
+    #     f"""Equivalent to Present day: <span style="color:green">{int(final_vals['total']/((100+inflation)/100)**select_tenure)}</span>""", unsafe_allow_html=True)
 elif calc_type == "REPAYMENT":
     
     col1, col2 = st.columns([1, 3])
@@ -100,14 +100,16 @@ elif calc_type == "REPAYMENT":
     col_x,col_y=col2.columns([1,1])
     #col1,col2,col3,col4=st.columns([1,1.8,1.8,1],gap="medium")
 
-    col_x.metric("EMI",formatINR( emi_amt, grouping=True),f"yearly: {formatINR( emi_amt*12, grouping=True)}","inverse")
+    col_x.metric("EMI",formatINR( emi_amt, grouping=True),f"yearly: {formatINR(emi_amt*12, grouping=True)}","inverse")
 
-    col_y.metric("Interest Rate",rate_of_interest ,f"{rate_of_interest-inflation:.2f} from Inflation","inverse")
+    
     # st.markdown(
     #     f"""EMI : <span style="color:green">{emi_amt}</span>""", unsafe_allow_html=True)
 
     extra_payment = col_x.number_input(
         "Extra Monthly Repayment", min_value=0, step=100)
+
+    col_y.metric("Interest Rate",rate_of_interest ,f"{rate_of_interest-inflation:.2f} from Inflation","inverse")
     rate_of_increment = col_y.slider(
         "Rate of increment", min_value=-20.0, step=0.5, value=0.0, max_value=20.0)
 
