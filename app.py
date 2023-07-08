@@ -6,7 +6,7 @@ from itertools import *
 import streamlit.components.v1 as stc
 from funcs import *
 import locale
-locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
+locale.setlocale(locale.LC_ALL, 'en_IN')
 
 #from more_itertools import *
 
@@ -27,7 +27,7 @@ st.set_page_config(  # Alternate names: setup_page, page, layout
 # #st.sidebar.image(image, use_column_width=False)
 st.sidebar.title(f"Investment Calculator")
 
-st.header("Welcome!!!")
+st.markdown(f"""<h1>Welcome!!!</h1>""",unsafe_allow_html=True)
 
 
 calc_type = st.sidebar.selectbox(
