@@ -6,7 +6,7 @@ from itertools import *
 import streamlit.components.v1 as stc
 from funcs import *
 import locale
-locale.setlocale(locale.LC_ALL, 'en_IN')
+locale.setlocale(locale.LC_MONETARY, 'en_IN')
 
 #from more_itertools import *
 
@@ -85,7 +85,7 @@ elif calc_type == "REPAYMENT":
     col_x,col_y=col2.columns([1,1])
     #col1,col2,col3,col4=st.columns([1,1.8,1.8,1],gap="medium")
 
-    col_x.metric("EMI",locale.format_string('%d', int(emi_amt), grouping=True),f"yearly: {locale.format_string('%d', int(emi_amt*12), grouping=True)}","inverse")
+    col_x.metric("EMI",locale.currency( emi_amt, grouping=True),f"yearly: {locale.currency( emi_amt*12, grouping=True)}","inverse")
 
     col_y.metric("Interest Rate",rate_of_interest ,f"{rate_of_interest-inflation:.2f} from Inflation","inverse")
     # st.markdown(
@@ -137,9 +137,9 @@ elif calc_type == "REPAYMENT":
     col0,col1,col2,col3=st.columns([0.5,1.5,1.5,1.5])
 
     col1.metric("Months of Repayment",str(num_months),f"years saved:{select_tenure-num_months/12:.2f}")
-    savings=locale.format_string('%d', int(emi_amt*select_tenure*12-df.sum().sum()), grouping=True)
-    col2.metric("Total Repayment.",locale.format_string("%d", int(df.sum().sum()), grouping=True),f"savings: {savings}")
-    col3.metric("Total repayment(inflation Adjusted)",locale.format_string("%d", int(inf_invested), grouping=True))
+    savings=locale.currency(emi_amt*select_tenure*12-df.sum().sum(), grouping=True)
+    col2.metric("Total Repayment.",locale.currency( df.sum().sum(), grouping=True),f"savings: {savings}")
+    col3.metric("Total repayment(inflation Adjusted)",locale.currency( inf_invested, grouping=True))
     # st.markdown(
     #     f"""Number of Months: <span style="color: green">{num_months}</span>""", unsafe_allow_html=True)
 
