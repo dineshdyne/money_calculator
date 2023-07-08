@@ -6,7 +6,7 @@ from itertools import *
 import streamlit.components.v1 as stc
 from funcs import *
 import locale
-locale.setlocale(locale.LC_MONETARY, 'en_IN')
+#locale.setlocale(locale.LC_MONETARY, 'en_IN')
 
 #from more_itertools import *
 
@@ -25,31 +25,36 @@ st.set_page_config(  # Alternate names: setup_page, page, layout
 
 # #image = Image.open("images/tvs-logo.png")
 # #st.sidebar.image(image, use_column_width=False)
-st.sidebar.title(f"Investment Calculator")
+st.sidebar.title(f"Financial Calculator")
 
-st.markdown(f"""<h1>Welcome!!!</h1>""",unsafe_allow_html=True)
+st.markdown(f"""<h1 style="text-align:center">Welcome!!!</h1>""",unsafe_allow_html=True)
 
 
-calc_type = st.sidebar.selectbox(
-    'select type', options=['INVESTMENT', 'REPAYMENT'])
+calc_type = st.sidebar.selectbox('select type', options=['INVESTMENT', 'REPAYMENT'])
 if calc_type == 'INVESTMENT':
-    select_tenure = st.slider("select tenure in yrs",
-                              min_value=1, max_value=50, value=15, step=1)
+    
 
+    col1, col2 = st.columns([1, 3])
+    lumpsum = col1.number_input("Lumpsum", min_value=0, value=0)
+    select_tenure = col2.slider("Select tenure in years",
+                              min_value=1, max_value=50, value=15, step=1)
     col1, col2 = st.columns([1, 1])
-    stop_year = col1.number_input(
-        "Investment Stop Year", min_value=0, max_value=select_tenure, step=1, value=select_tenure)
-    inflation = col2.number_input(
-        "Inflation (yearly) in percentage", min_value=0.0, max_value=14.0, value=6.0, step=0.1)
 
     monthly_inv = col1.number_input(
         "Monthly inv", min_value=0, value=5000, step=100)
-    lumpsum = col1.number_input("Lumpsum", min_value=0, value=0)
-    rate_of_increase = col2.number_input(
-        "rate of Increase(yr)", min_value=0.0, max_value=100.0, step=0.1, value=0.0)
+    
+    rate_of_increase = col2.slider(
+        "Rate of Increment(yearly)", min_value=0.0, max_value=100.0, step=0.1, value=0.0)
 
-    rate_of_return = st.slider(
-        "Rate of return", min_value=0.0, max_value=100.0, value=12.0, step=0.5)
+    col1, col2 = st.columns([1, 1])
+    stop_year = col1.number_input(
+        "Investment Closing Year", min_value=0, max_value=select_tenure, step=1, value=select_tenure)
+    inflation = col2.number_input(
+        "Inflation rate(yearly)", min_value=0.0, max_value=14.0, value=6.0, step=0.1)
+
+    col1, col2,col3 = st.columns([1,4,1])
+    rate_of_return = col2.slider(
+        "Expected Rate of Return", min_value=0.0, max_value=100.0, value=12.0, step=0.5)
 
     ret = sip(monthly_inv, select_tenure,
               rate_of_return, lumpsum, is_percent=True, inflation_rate=inflation, rate_of_increase=rate_of_increase, stop_year=stop_year)
@@ -57,7 +62,17 @@ if calc_type == 'INVESTMENT':
     final_vals = ret['Amount every month'].iloc[-1].astype(int)  # .to_dict()
 
     final_vals = final_vals.to_dict()
-    st.write(final_vals)
+
+    col1,col2,col3,col4 =st.columns([1,1.5,1.5,1.5])
+
+    col2.metric("Invested Amt",formatINR(final_vals["invested"]) )
+    col3.metric("Ending Market Value",formatINR(final_vals['total']))
+    col4.metric("Net Gain",formatINR(final_vals["profit"]))
+
+    col1,col2,col3 =st.columns([1,1.8,1.8])
+    col2.metric("Investment (Inflation Adjusted)", formatINR(final_vals["inflation_adj_invested"]))
+    col3.metric("End Value (Inflation Adjusted)",formatINR(final_vals['total']/((100+inflation)/100)**select_tenure))
+    #st.write(final_vals)
     st.plotly_chart(px.bar(ret['Amount every month'], y=[
         'invested', 'profit']), use_container_width=True)
 
@@ -85,7 +100,7 @@ elif calc_type == "REPAYMENT":
     col_x,col_y=col2.columns([1,1])
     #col1,col2,col3,col4=st.columns([1,1.8,1.8,1],gap="medium")
 
-    col_x.metric("EMI",locale.currency( emi_amt, grouping=True),f"yearly: {locale.currency( emi_amt*12, grouping=True)}","inverse")
+    col_x.metric("EMI",formatINR( emi_amt, grouping=True),f"yearly: {formatINR( emi_amt*12, grouping=True)}","inverse")
 
     col_y.metric("Interest Rate",rate_of_interest ,f"{rate_of_interest-inflation:.2f} from Inflation","inverse")
     # st.markdown(
@@ -106,9 +121,11 @@ elif calc_type == "REPAYMENT":
     num_months = 0
     inf_invested = 0
     emi_extra = emi_amt
+    loan_amt_col=[]
+    
     # import time
     # my_bar = st.progress(0, text="Running calculations")
-    while loan_amt > 0:
+    while (loan_amt > 0.1):
         
         
         num_months += 1
@@ -128,18 +145,21 @@ elif calc_type == "REPAYMENT":
         # st.write(int(loan_amt))
         interest.append(int_comp)
         principle.append(princ_comp)
+        loan_amt_col.append(loan_amt)
     # st.write(int(loan_amt))
     df = pd.DataFrame(zip(principle,  extra, interest, emi_inc),
                       columns=['Principle', 'Extra_Repayment', 'Interest', 'EMI_increment'])
+    # making sure all values are not zero in a col
     df = df.loc[:, (df != 0).any(axis=0)]
 
 
-    col0,col1,col2,col3=st.columns([0.5,1.5,1.5,1.5])
+    col0,col1,col2,col3=st.columns([1,1.8,1.8,2])
 
     col1.metric("Months of Repayment",str(num_months),f"years saved:{select_tenure-num_months/12:.2f}")
-    savings=locale.currency(emi_amt*select_tenure*12-df.sum().sum(), grouping=True)
-    col2.metric("Total Repayment.",locale.currency( df.sum().sum(), grouping=True),f"savings: {savings}")
-    col3.metric("Total repayment(inflation Adjusted)",locale.currency( inf_invested, grouping=True))
+    savings=formatINR(emi_amt*select_tenure*12-df.sum().sum(), grouping=True)
+
+    col2.metric("Total Repayment.",formatINR( df.sum().sum(), grouping=True),f"savings: {savings}")
+    col3.metric("Total repayment(inflation Adjusted)",formatINR( inf_invested, grouping=True))
     # st.markdown(
     #     f"""Number of Months: <span style="color: green">{num_months}</span>""", unsafe_allow_html=True)
 
