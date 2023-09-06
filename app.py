@@ -36,23 +36,23 @@ if calc_type == 'INVESTMENT':
 
     col1, col2 = st.columns([1, 3])
     lumpsum = col1.number_input("Lumpsum", min_value=0, value=0)
-    select_tenure = col2.slider("Select tenure in years",
-                              min_value=1, max_value=50, value=15, step=1)
-    col1, col2 = st.columns([1, 1])
+    stop_year,select_tenure = col2.slider("Select Investment Closing & Maturity years",
+                              min_value=1, max_value=50, value=(10,15), step=1)
+    col1, col2, col3 = st.columns([2,2, 1])
 
     monthly_inv = col1.number_input(
-        "Monthly inv", min_value=0, value=5000, step=100)
+        "Monthly SIP", min_value=0, value=5000, step=100)
     
     rate_of_increase = col2.slider(
-        "Rate of Increment(yearly)", min_value=0.0, max_value=100.0, step=0.1, value=0.0)
+        "SIP Increment(% yearly)", min_value=0.0, max_value=100.0, step=0.5, value=0.0)
 
-    col1, col2 = st.columns([1, 1])
-    stop_year = col1.number_input(
-        "Investment Closing Year", min_value=0, max_value=select_tenure, step=1, value=select_tenure)
-    inflation = col2.number_input(
-        "Inflation rate(yearly)", min_value=0.0, max_value=14.0, value=6.0, step=0.1)
+    # col1, col2 = st.columns([1, 1])
+    # stop_year = col1.number_input(
+    #     "Investment Closing Year", min_value=0, max_value=select_tenure, step=1, value=select_tenure)
+    inflation = col3.number_input(
+        "Inflation Rate", min_value=0.0, max_value=14.0, value=6.0, step=0.1)
 
-    col1, col2,col3 = st.columns([1,4,1])
+    col1, col2,col3 = st.columns([1.5,4,1])
     rate_of_return = col2.slider(
         "Expected Rate of Return", min_value=0.0, max_value=100.0, value=12.0, step=0.5)
 
@@ -65,16 +65,18 @@ if calc_type == 'INVESTMENT':
 
     col1,col2,col3,col4 =st.columns([1,1.5,1.5,1.5])
 
-    col2.metric("Invested Amt",formatINR(final_vals["invested"]) )
-    col3.metric("Ending Market Value",formatINR(final_vals['total']))
+    col2.metric("Invested Amount (Till closing)",formatINR(final_vals["invested"]) )
+    col3.metric("Maturity Market Value",formatINR(final_vals['total']))
     col4.metric("Net Gain",formatINR(final_vals["profit"]))
 
     col1,col2,col3 =st.columns([1,1.8,1.8])
     col2.metric("Investment (Inflation Adjusted)", formatINR(final_vals["inflation_adj_invested"]))
-    col3.metric("End Value (Inflation Adjusted)",formatINR(final_vals['total']/((100+inflation)/100)**select_tenure))
+    col3.metric("Maturity Value (Inflation Adjusted)",formatINR(final_vals['total']/((100+inflation)/100)**select_tenure))
     #st.write(final_vals)
-    st.plotly_chart(px.bar(ret['Amount every month'], y=[
-        'invested', 'profit']), use_container_width=True)
+    st.plotly_chart(px.bar(ret['Amount every month'],
+                           y=['invested', 'profit'],
+                           labels={"index":"Months","value":"Amount"},
+                           color_discrete_sequence=['mediumslateblue', 'lawngreen']), use_container_width=True)
 
     # st.markdown(
     #     f"""Total : <span style="color:green">{int(final_vals['total'])}</span>""", unsafe_allow_html=True)
@@ -171,9 +173,14 @@ elif calc_type == "REPAYMENT":
     #     f"""Total Paid : Inflation Adjusted <span style="color:green">{int(inf_invested)}</span>""", unsafe_allow_html=True)
 
     st.markdown("<h2 style='text-align: center; '>Chart Representation</h2>", unsafe_allow_html=True)
+    # st.write(sorted(df.columns,reverse=True))
     st.plotly_chart(
-        px.bar(df, y=list(df.columns),labels={"index":'Months',"value":"Monthly Payments"}
-               #color_discrete_sequence=['green', 'blue', 'red', 'cyan']
-               ), use_container_width=True)
+        px.bar(df,
+               y=sorted(df.columns,reverse=True),
+               labels={"index":'Months',"value":"Monthly Payments"},
+               color_discrete_sequence=['mediumslateblue','orangered','lawngreen','yellow']#['#136CA8', '#DE7D7D','#3F934A', 'cyan']
+               ),
+        use_container_width=True
+        )
     
 
