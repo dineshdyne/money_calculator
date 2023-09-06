@@ -1,6 +1,4 @@
-numpy==1.24.4
-pandas==2.0.3
-plotly==5.15.0
-python_dateutil==2.8.2
-streamlit==1.24.1
+pandas
+plotly
+streamlit
 watchdog
