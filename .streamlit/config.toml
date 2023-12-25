@@ -57,13 +57,13 @@ messageFormat = "%(asctime)s %(message)s"
 # st.cache_resource.
 
 # Default: true
-caching = true
+# caching = true
 
 # If false, makes your Streamlit script not draw to a
 # Streamlit app.
 
 # Default: true
-displayEnabled = true
+# displayEnabled = true
 
 # Controls whether uncaught app exceptions and deprecation warnings
 # are displayed in the browser. By default, this is set to True and
@@ -108,7 +108,7 @@ magicEnabled = true
 # script's execution.
 
 # Default: false
-installTracer = false
+# installTracer = false
 
 # Sets the MPLBACKEND environment variable to Agg inside Streamlit to
 # prevent Python crashing.
