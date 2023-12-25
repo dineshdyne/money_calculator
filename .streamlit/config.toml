@@ -8,7 +8,7 @@
 # If you'd like to turn off this warning, set this to True.
 
 # Default: false
-disableWatchdogWarning = false
+# disableWatchdogWarning = false
 
 # By default, Streamlit displays a warning when a user sets both a widget
 # default value in the function defining the widget and a widget value via
@@ -34,7 +34,7 @@ showWarningOnDirectExecution = true
 #              versatile.
 
 # Default: "arrow"
-dataFrameSerialization = "arrow"
+# dataFrameSerialization = "arrow"
 
 [logger]
 
